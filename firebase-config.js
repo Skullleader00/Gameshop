@@ -13,4 +13,5 @@
   storageBucket: "gameshop-d1362.firebasestorage.app",
   messagingSenderId: "446170708263",
   appId: "1:446170708263:web:d30cc27d6b31ef95cb5102",
+  measurementId: "G-CH0HJ0EDKW"
 };
