@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">GameShop — ร้านรหัสเกม</title>
+<!-- ไม่ให้ search engine เจอหน้า admin -->
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="index.html">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Sarabun:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --r:#e8001d;--rd:#9a0013;--rg:#ff2040;
+  --b:#070707;--b2:#0f0f0f;--b3:#181818;--b4:#222;
+  --g:#333;--gl:#777;--gll:#aaa;
+  --w:#f0eaea;--wd:#b8b0b0;
+  --green:#00e676;--orange:#ff9100;
+  --fd:'Rajdhani',sans-serif;--fb:'Sarabun',sans-serif;--fm:'Share Tech Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--b);color:var(--w);font-family:var(--fb);min-height:100vh;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.06) 3px,rgba(0,0,0,.06) 4px);pointer-events:none;z-index:9999}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--b)}::-webkit-scrollbar-thumb{background:var(--rd)}
+
+/* HEADER */
+header{position:sticky;top:0;z-index:500;background:rgba(7,7,7,.96);border-bottom:1px solid #1e0005;backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:space-between;padding:0 1.5rem;height:58px;gap:1rem}
+.logo-wrap{display:flex;align-items:center;gap:.7rem;text-decoration:none;flex-shrink:0}
+#shopLogoEmoji{font-size:1.5rem}
+#shopLogoName{font-family:var(--fd);font-size:1.6rem;font-weight:700;letter-spacing:3px;color:var(--r);text-shadow:0 0 18px rgba(232,0,29,.5)}
+.header-right{display:flex;align-items:center;gap:.5rem}
+.hbtn{background:none;border:1px solid var(--g);color:var(--wd);font-family:var(--fb);font-size:.8rem;padding:.35rem .9rem;cursor:pointer;transition:all .2s;white-space:nowrap}
+.hbtn:hover{border-color:var(--r);color:var(--r)}
+.hbtn.red{background:var(--r);border-color:var(--r);color:#fff;font-weight:600}
+.hbtn.red:hover{background:var(--rg);box-shadow:0 0 16px rgba(255,0,60,.4)}
+
+/* HERO */
+.hero{position:relative;padding:3.5rem 1.5rem 2.5rem;text-align:center;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 50% 0%,rgba(180,0,18,.16),transparent 70%);pointer-events:none}
+.hero-live{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--fm);font-size:.68rem;color:var(--r);border:1px solid var(--rd);padding:.18rem .8rem;margin-bottom:1rem;letter-spacing:2px}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--r);animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.hero h1{font-family:var(--fd);font-size:clamp(2rem,5vw,4rem);font-weight:700;letter-spacing:1px;line-height:1.1;margin-bottom:.8rem}
+.hero h1 em{font-style:normal;color:var(--r);text-shadow:0 0 28px rgba(232,0,29,.45)}
+#heroDesc{color:var(--gl);font-size:.92rem;max-width:420px;margin:0 auto 1.5rem;line-height:1.7}
+.hero-fb{display:inline-flex;align-items:center;gap:.5rem;background:#1877F2;color:#fff;font-family:var(--fd);font-size:.9rem;font-weight:600;letter-spacing:1px;padding:.55rem 1.4rem;cursor:pointer;border:none;transition:all .2s;text-decoration:none}
+.hero-fb:hover{background:#1464d0;box-shadow:0 0 18px rgba(24,119,242,.4)}
+
+/* TICKER */
+.ticker-bar{background:var(--r);overflow:hidden;padding:.35rem 0;white-space:nowrap}
+.ticker-inner{display:inline-block;animation:tick 35s linear infinite;font-family:var(--fm);font-size:.72rem;letter-spacing:2px;color:#fff}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* CONTROLS */
+.controls{display:flex;gap:.5rem;padding:1.2rem 1.5rem;flex-wrap:wrap;border-bottom:1px solid var(--b4);align-items:center}
+.catbtn{background:var(--b3);border:1px solid var(--g);color:var(--wd);font-family:var(--fb);font-size:.8rem;padding:.35rem .9rem;cursor:pointer;transition:all .2s}
+.catbtn:hover,.catbtn.on{background:var(--rd);border-color:var(--r);color:#fff}
+.srch{margin-left:auto;position:relative}
+.srch input{background:var(--b3);border:1px solid var(--g);color:var(--w);font-family:var(--fm);font-size:.78rem;padding:.38rem .9rem .38rem 2rem;width:200px;outline:none;transition:border-color .2s}
+.srch input:focus{border-color:var(--r)}
+.srch input::placeholder{color:var(--g)}
+.srch-ic{position:absolute;left:.6rem;top:50%;transform:translateY(-50%);color:var(--gl);font-size:.85rem}
+
+/* GRID */
+main{padding:1.5rem}
+.sec-title{font-family:var(--fd);font-size:1.1rem;letter-spacing:3px;color:var(--wd);margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem}
+.sec-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--rd),transparent)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1rem}
+
+/* CARD */
+.card{background:var(--b2);border:1px solid var(--b4);position:relative;overflow:hidden;transition:transform .22s,border-color .22s,box-shadow .22s;cursor:pointer}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--r),transparent);opacity:0;transition:opacity .22s}
+.card:hover{transform:translateY(-3px);border-color:var(--rd);box-shadow:0 6px 28px rgba(180,0,20,.2)}
+.card:hover::before{opacity:1}
+.card.soldout{opacity:.5;cursor:not-allowed}
+.card.soldout:hover{transform:none;border-color:var(--b4);box-shadow:none}
+.card-thumb{width:100%;height:140px;background:var(--b3);display:flex;align-items:center;justify-content:center;font-size:3.2rem;position:relative;overflow:hidden}
+.card-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,0,20,.07),transparent 60%)}
+.badge{position:absolute;top:.5rem;right:.5rem;font-family:var(--fm);font-size:.62rem;padding:.15rem .5rem;letter-spacing:1px;z-index:2}
+.badge.hot{background:var(--r);color:#fff}.badge.new{background:var(--orange);color:#000}.badge.sold{background:var(--g);color:var(--gl)}
+.cbody{padding:.9rem}
+.c-game{font-family:var(--fm);font-size:.65rem;color:var(--r);letter-spacing:2px;text-transform:uppercase;margin-bottom:.2rem}
+.c-title{font-family:var(--fd);font-size:1rem;font-weight:600;color:var(--w);margin-bottom:.4rem;line-height:1.3}
+.c-desc{font-size:.78rem;color:var(--gl);line-height:1.5;margin-bottom:.7rem}
+.c-foot{display:flex;align-items:center;justify-content:space-between;padding-top:.7rem;border-top:1px solid var(--b4);gap:.5rem}
+.c-price{font-family:var(--fd);font-size:1.3rem;font-weight:700;color:var(--r)}
+.c-price small{font-size:.7rem;font-weight:400;color:var(--gl);font-family:var(--fb);margin-left:2px}
+.c-stock{font-family:var(--fm);font-size:.68rem;color:var(--gl)}
+.c-stock.low{color:var(--orange)}.c-stock.out{color:var(--g)}
+.buybtn{background:var(--r);border:none;color:#fff;font-family:var(--fd);font-size:.85rem;font-weight:700;letter-spacing:1px;padding:.45rem 1rem;cursor:pointer;transition:all .2s;flex-shrink:0}
+.buybtn:hover{background:var(--rg);box-shadow:0 0 14px rgba(255,0,60,.45)}
+.buybtn:disabled{background:var(--g);cursor:not-allowed;box-shadow:none}
+
+/* OVERLAY */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:800;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .22s}
+.ov.on{opacity:1;pointer-events:all}
+.modal{background:var(--b2);border:1px solid var(--rd);width:100%;max-width:480px;max-height:92vh;overflow-y:auto;position:relative;transform:translateY(16px);transition:transform .22s;box-shadow:0 0 50px rgba(180,0,20,.25)}
+.ov.on .modal{transform:translateY(0)}
+.mhead{padding:1rem 1.3rem;border-bottom:1px solid var(--b4);display:flex;align-items:center;justify-content:space-between}
+.mtitle{font-family:var(--fd);font-size:1.1rem;letter-spacing:2px;color:var(--r)}
+.mclose{background:none;border:1px solid var(--g);color:var(--gl);width:26px;height:26px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.mclose:hover{border-color:var(--r);color:var(--r)}
+.mbody{padding:1.3rem}
+
+/* BUY MODAL */
+.buy-info{background:var(--b3);border:1px solid var(--b4);padding:.9rem;margin-bottom:1rem;display:flex;gap:.9rem;align-items:center}
+.buy-emo{font-size:2.5rem}.buy-det h3{font-family:var(--fd);font-size:1rem;letter-spacing:1px}
+.buy-price{font-family:var(--fd);font-size:1.5rem;font-weight:700;color:var(--r);margin-top:.2rem}
+.fbbtn{width:100%;background:#1877F2;border:none;color:#fff;font-family:var(--fd);font-size:.95rem;font-weight:700;letter-spacing:1px;padding:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s}
+.fbbtn:hover{background:#1464d0;box-shadow:0 0 16px rgba(24,119,242,.4)}
+.note{margin-top:.9rem;padding:.7rem;background:rgba(200,0,20,.07);border-left:2px solid var(--r);font-size:.77rem;color:var(--gl);line-height:1.6}
+
+/* LOADING */
+.loading{grid-column:1/-1;text-align:center;padding:4rem;color:var(--gl)}
+.spinner{width:36px;height:36px;border:2px solid var(--b4);border-top-color:var(--r);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.empty{grid-column:1/-1;text-align:center;padding:4rem;color:var(--gl)}
+.empty .big{font-size:2.8rem;margin-bottom:.8rem}
+.empty p{font-family:var(--fm);font-size:.8rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--b2);border:1px solid var(--r);padding:.7rem 1.1rem;font-family:var(--fm);font-size:.78rem;color:var(--w);z-index:9000;transform:translateX(140%);transition:transform .28s;box-shadow:0 0 18px rgba(200,0,20,.3);max-width:280px}
+.toast.show{transform:translateX(0)}
+.toast.err{border-color:#ff9100}
+
+/* FIREBASE CONFIG NOTICE */
+.config-notice{background:#1a0a00;border:1px solid var(--orange);padding:1rem 1.5rem;font-family:var(--fm);font-size:.75rem;color:var(--orange);display:flex;align-items:center;gap:.8rem;line-height:1.6}
+.config-notice a{color:#ffb74d;text-underline-offset:2px}
+
+footer{margin-top:3rem;border-top:1px solid var(--b4);padding:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.8rem}
+.ft-logo{font-family:var(--fd);font-size:1.1rem;font-weight:700;color:var(--rd);letter-spacing:4px}
+.ft-txt{font-family:var(--fm);font-size:.7rem;color:var(--g)}
+
+@media(max-width:560px){
+  header{padding:0 .8rem}#shopLogoName{font-size:1.2rem}
+  main{padding:1rem}.controls{padding:.8rem}.srch input{width:140px}
+  .hero{padding:2.5rem 1rem 2rem}
+}
+</style>
+</head>
+<body>
+
+<!-- Firebase config notice (shown until configured) -->
+<div class="config-notice" id="configNotice" style="display:none">
+  ⚠️ &nbsp;ยังไม่ได้ตั้งค่า Firebase — แก้ไขไฟล์ <strong>firebase-config.js</strong> ใส่ค่าจาก Firebase Console ของคุณ
+  &nbsp;<a href="https://console.firebase.google.com" target="_blank">เปิด Firebase Console →</a>
+</div>
+
+<header>
+  <a href="index.html" class="logo-wrap">
+    <span id="shopLogoEmoji">🎮</span>
+    <span id="shopLogoName">GameShop</span>
+  </a>
+  <div class="header-right"></div>
+</header>
+
+<div class="hero">
+  <div class="hero-live"><span class="live-dot"></span>OPEN SHOP</div>
+  <h1>ร้าน<em id="heroName">GameShop</em><br>รหัสเกมราคาถูก</h1>
+  <p id="heroDesc">ซื้อรหัสเกม Items และของในเกมทุกแพลตฟอร์ม ติดต่อตรงผ่าน Facebook</p>
+  <button class="hero-fb" onclick="openShopFb()">📘 ติดต่อร้านผ่าน Facebook</button>
+</div>
+
+<div class="ticker-bar"><span class="ticker-inner" id="tickerEl">&nbsp;</span></div>
+
+<div class="controls" id="shopTop">
+  <button class="catbtn on" onclick="setcat(this,'all')">ทั้งหมด</button>
+  <button class="catbtn" onclick="setcat(this,'mobile')">📱 มือถือ</button>
+  <button class="catbtn" onclick="setcat(this,'pc')">💻 PC</button>
+  <button class="catbtn" onclick="setcat(this,'console')">🎮 Console</button>
+  <button class="catbtn" onclick="setcat(this,'item')">🎁 Item/สกิน</button>
+  <button class="catbtn" onclick="setcat(this,'account')">👤 Account</button>
+  <div class="srch"><span class="srch-ic">🔍</span><input id="searchQ" type="text" placeholder="ค้นหา..." oninput="renderProducts()"></div>
+</div>
+
+<main>
+  <div class="sec-title">สินค้าในร้าน</div>
+  <div class="grid" id="grid">
+    <div class="loading"><div class="spinner"></div><div style="font-family:var(--fm);font-size:.8rem">กำลังโหลด...</div></div>
+  </div>
+</main>
+
+<footer>
+  <div class="ft-logo" id="ftLogo">SHOP</div>
+  <div class="ft-txt" id="ftTxt">© 2025 — ร้านรหัสเกม</div>
+</footer>
+
+<!-- BUY MODAL -->
+<div class="ov" id="ovBuy" onclick="if(event.target===this)closeOv('ovBuy')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mhead"><div class="mtitle">สั่งซื้อสินค้า</div><button class="mclose" onclick="closeOv('ovBuy')">✕</button></div>
+    <div class="mbody" id="buyBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { FIREBASE_CONFIG } from "./firebase-config.js";
+
+// ── State ──
+let allProducts = [];
+let shopInfo = { name:'GameShop', emoji:'🎮', desc:'ซื้อรหัสเกม Items และของในเกมทุกแพลตฟอร์ม', fb:'https://www.facebook.com/' };
+let currentCat = 'all';
+
+// ── Init Firebase ──
+let app, db;
+try {
+  if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY') {
+    document.getElementById('configNotice').style.display = 'flex';
+    loadDemo();
+  } else {
+    app = initializeApp(FIREBASE_CONFIG);
+    db = getDatabase(app);
+    listenShop();
+    listenProducts();
+  }
+} catch(e) {
+  document.getElementById('configNotice').style.display = 'flex';
+  loadDemo();
+}
+
+function loadDemo() {
+  allProducts = [
+    {id:'demo1',title:'เพชร Free Fire 1000 เพชร',game:'Free Fire',cat:'mobile',desc:'เพชร FF ราคาถูก เติมให้เลย ปลอดภัย 100%',price:99,stock:50,emoji:'💎',badge:'hot'},
+    {id:'demo2',title:'UC PUBG Mobile 660 UC',game:'PUBG Mobile',cat:'mobile',desc:'UC ราคาถูก เติมได้ทุกเซิร์ฟ',price:249,stock:20,emoji:'🔫',badge:''},
+    {id:'demo3',title:'VALORANT 1000 VP',game:'VALORANT',cat:'pc',desc:'VP สำหรับซื้อสกิน ราคาพิเศษ',price:199,stock:15,emoji:'🏆',badge:'new'},
+    {id:'demo4',title:'Genshin 6480 Primogems',game:'Genshin Impact',cat:'mobile',desc:'Primo สำหรับ pull ตัวละคร',price:1490,stock:5,emoji:'✨',badge:'hot'},
+    {id:'demo5',title:'CS2 Prime Status',game:'CS2',cat:'pc',desc:'Account CS2 Prime เล่นได้เลย',price:399,stock:3,emoji:'🎯',badge:''},
+    {id:'demo6',title:'สกิน ROV ตำนาน',game:'ROV',cat:'mobile',desc:'สกินระดับตำนาน ราคาพิเศษ',price:350,stock:0,emoji:'⚔️',badge:''},
+  ];
+  renderProducts();
+}
+
+function listenShop() {
+  onValue(ref(db,'shop'), snap => {
+    const d = snap.val();
+    if (d) { shopInfo = d; applyMeta(); }
+  });
+}
+
+function listenProducts() {
+  onValue(ref(db,'products'), snap => {
+    const d = snap.val();
+    allProducts = d ? Object.entries(d).map(([id,v])=>({id,...v})) : [];
+    allProducts.sort((a,b) => (b.createdAt||0)-(a.createdAt||0));
+    renderProducts();
+    renderTicker();
+  });
+}
+
+function applyMeta() {
+  document.getElementById('shopLogoEmoji').textContent = shopInfo.emoji||'🎮';
+  document.getElementById('shopLogoName').textContent = shopInfo.name||'GameShop';
+  document.getElementById('heroName').textContent = shopInfo.name||'GameShop';
+  document.getElementById('heroDesc').textContent = shopInfo.desc||'';
+  document.getElementById('ftLogo').textContent = shopInfo.name||'SHOP';
+  document.getElementById('ftTxt').textContent = `© 2025 ${shopInfo.name} — ร้านรหัสเกม`;
+  document.title = `${shopInfo.name} — ร้านรหัสเกม`;
+}
+
+function renderTicker() {
+  const items = allProducts.filter(p=>p.stock>0);
+  if (!items.length) return;
+  const txt = items.map(p=>`${p.emoji||'🎮'} ${p.game} — ${p.title} ฿${Number(p.price).toLocaleString()}`).join(' &nbsp;●&nbsp; ');
+  document.getElementById('tickerEl').innerHTML = `&nbsp;&nbsp;&nbsp;${txt} &nbsp;●&nbsp; ${txt}`;
+}
+
+window.renderProducts = function() {
+  const q = document.getElementById('searchQ').value.toLowerCase();
+  const list = allProducts.filter(p => {
+    const mc = currentCat==='all' || p.cat===currentCat;
+    const mq = !q || p.title.toLowerCase().includes(q) || (p.game||'').toLowerCase().includes(q);
+    return mc && mq;
+  });
+  const grid = document.getElementById('grid');
+  if (!list.length) {
+    grid.innerHTML = `<div class="empty"><div class="big">🔍</div><p>ไม่พบสินค้า</p></div>`;
+    return;
+  }
+  grid.innerHTML = list.map(p => {
+    const so = p.stock<=0;
+    const low = p.stock>0 && p.stock<=5;
+    const stockTxt = so?'หมดสต็อก':low?`เหลือ ${p.stock} ชิ้น`:`สต็อก ${p.stock}`;
+    const stockCls = so?'out':low?'low':'';
+    const badgeHtml = so?`<div class="badge sold">SOLD OUT</div>`:p.badge==='hot'?`<div class="badge hot">HOT</div>`:p.badge==='new'?`<div class="badge new">NEW</div>`:'';
+    return `
+    <div class="card${so?' soldout':''}" onclick="${so?'':``openBuy('${p.id}')``}">
+      <div class="card-thumb">${p.emoji||'🎮'}${badgeHtml}</div>
+      <div class="cbody">
+        <div class="c-game">${p.game||''}</div>
+        <div class="c-title">${p.title}</div>
+        <div class="c-desc">${p.desc||''}</div>
+        <div class="c-foot">
+          <div>
+            <div class="c-price">฿${Number(p.price).toLocaleString()}<small>บาท</small></div>
+            <div class="c-stock ${stockCls}">${stockTxt}</div>
+          </div>
+          <button class="buybtn" ${so?'disabled':''} onclick="event.stopPropagation();${so?'':``openBuy('${p.id}')``}">${so?'หมด':'ซื้อเลย'}</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+window.openBuy = function(id) {
+  const p = allProducts.find(x=>x.id===id);
+  if (!p||p.stock<=0) return;
+  document.getElementById('buyBody').innerHTML = `
+    <div class="buy-info">
+      <div class="buy-emo">${p.emoji||'🎮'}</div>
+      <div class="buy-det">
+        <div style="font-family:var(--fm);font-size:.62rem;color:var(--r);letter-spacing:2px">${p.game||''}</div>
+        <h3>${p.title}</h3>
+        <div class="buy-price">฿${Number(p.price).toLocaleString()}</div>
+      </div>
+    </div>
+    <div style="font-family:var(--fm);font-size:.68rem;color:var(--gl);margin-bottom:.3rem">รายละเอียด</div>
+    <div style="font-size:.82rem;color:var(--gll);line-height:1.6;margin-bottom:1rem">${p.desc||'-'}</div>
+    <div style="font-family:var(--fm);font-size:.68rem;color:var(--gl);margin-bottom:.8rem">
+      สต็อก: <span style="color:${p.stock<=5?'var(--orange)':'var(--green)'}">${p.stock} ชิ้น</span>
+    </div>
+    <button class="fbbtn" onclick="goFb('${id}')">📘 ติดต่อสั่งซื้อผ่าน Facebook</button>
+    <div class="note">ระบบจะเปิด Facebook เพื่อติดต่อกับทางร้านโดยตรง<br>กรุณาตกลงรายละเอียดและการชำระเงินกับทางร้านก่อนทุกครั้ง</div>
+  `;
+  document.getElementById('ovBuy').classList.add('on');
+};
+
+window.goFb = function(id) {
+  const p = allProducts.find(x=>x.id===id);
+  let fb = shopInfo.fb||'https://www.facebook.com/';
+  try {
+    const u = new URL(fb);
+    const path = u.pathname.replace(/^\/|\/$/g,'');
+    if (path && !path.startsWith('messages') && !path.startsWith('profile')) fb=`https://m.me/${path}`;
+  } catch(e){}
+  window.open(fb,'_blank');
+  closeOv('ovBuy');
+  toast('กำลังเปิด Facebook Messenger...');
+};
+
+window.openShopFb = function() { window.open(shopInfo.fb||'https://www.facebook.com/','_blank'); };
+
+window.setcat = function(btn,cat) {
+  document.querySelectorAll('.catbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); currentCat=cat; renderProducts();
+};
+
+window.closeOv = function(id) { document.getElementById(id).classList.remove('on'); };
+
+window.toast = function(msg, err=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.toggle('err',err); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+};
+
+applyMeta();
+</script>
+</body>
+</html>
