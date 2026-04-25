@@ -233,14 +233,17 @@ body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradie
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getDatabase, ref, set, push, remove, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 import { FIREBASE_CONFIG } from "./firebase-config.js";
 
-let app, auth, db, storage;
+let app, auth, db;
 let allProducts = [];
 let shopInfo = {};
 let editingId = null;
 let currentImages = [];
+
+// ── Cloudinary Config ──
+const CLOUDINARY_NAME = 'deskbu8zy';
+const CLOUDINARY_PRESET = 'ml_default'; // <-- เปลี่ยนเป็นชื่อ Upload Preset ที่คุณตั้งไว้ (ต้องเป็น Unsigned)
 
 const SECRET_KEY = 'Kengshop';
 const params = new URLSearchParams(window.location.search);
@@ -254,7 +257,6 @@ try {
   app = initializeApp(FIREBASE_CONFIG);
   auth = getAuth(app);
   db = getDatabase(app);
-  storage = getStorage(app);
   onAuthStateChanged(auth, user => {
     if (user) { showAdmin(); } else { showLogin(); }
   });
@@ -325,16 +327,33 @@ function renderProdList() {
 window.handleImgUpload = async (input) => {
   if (currentImages.length >= 3) { toast('สูงสุด 3 รูปเท่านั้น', 'err'); return; }
   const files = Array.from(input.files).slice(0, 3 - currentImages.length);
+  
   for (const file of files) {
-    const name = Date.now() + '_' + file.name;
-    const r = sRef(storage, 'products/' + name);
-    toast('กำลังอัปโหลด...');
+    toast('กำลังอัปโหลดไปยัง Cloudinary...');
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_PRESET);
+
     try {
-      const snap = await uploadBytes(r, file);
-      const url = await getDownloadURL(snap.ref);
-      currentImages.push(url);
-      renderImgPreview();
-    } catch(e) { toast('อัปโหลดไม่สำเร็จ', 'err'); }
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_NAME}/image/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      
+      if (data.secure_url) {
+        currentImages.push(data.secure_url);
+        renderImgPreview();
+        toast('อัปโหลดสำเร็จ');
+      } else {
+        console.error('Cloudinary Error:', data);
+        toast('อัปโหลดไม่สำเร็จ: ' + (data.error?.message || 'Unknown error'), 'err');
+      }
+    } catch(e) {
+      console.error('Upload Error:', e);
+      toast('เกิดข้อผิดพลาดในการเชื่อมต่อ', 'err');
+    }
   }
   input.value = '';
 };
