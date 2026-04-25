@@ -214,7 +214,7 @@ try {
     loadDemo();
   } else {
     app = initializeApp(FIREBASE_CONFIG);
-    db = getDatabase(app);
+    db = getDatabase(app, "https://gameshop-d1362-default-rtdb.asia-southeast1.firebasedatabase.app");
     listenShop();
     listenProducts();
   }
