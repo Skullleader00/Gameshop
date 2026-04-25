@@ -215,12 +215,15 @@ try {
   } else {
     app = initializeApp(FIREBASE_CONFIG);
     db = getDatabase(app);
+    console.log("Firebase DB Initialized:", db.app.options.databaseURL);
     listenShop();
     listenProducts();
   }
 } catch(e) {
   console.error("Firebase Init Error:", e);
-  document.getElementById('configNotice').style.display = 'flex';
+  const notice = document.getElementById('configNotice');
+  notice.style.display = 'flex';
+  notice.innerHTML = `⚠️ &nbsp;Firebase Error: ${e.message} (ตรวจสอบ Console เพื่อดูรายละเอียด)`;
   loadDemo();
 }
 
