@@ -62,13 +62,14 @@ main{padding:1.5rem}
 .card:hover::before{opacity:1}
 .card.soldout{opacity:.5;cursor:not-allowed}
 .card.soldout:hover{transform:none;border-color:var(--b4);box-shadow:none}
-.card-thumb{width:100%;height:140px;background:var(--b3);display:flex;align-items:center;justify-content:center;font-size:3.2rem;position:relative;overflow:hidden}
+.card-thumb{width:100%;height:160px;background:var(--b3);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.card-thumb img{width:100%;height:100%;object-fit:cover}
 .badge{position:absolute;top:.5rem;right:.5rem;font-family:var(--fm);font-size:.62rem;padding:.15rem .5rem;letter-spacing:1px;z-index:2}
 .badge.hot{background:var(--r);color:#fff}.badge.new{background:var(--orange);color:#000}.badge.sold{background:var(--g);color:var(--gl)}
 .cbody{padding:.9rem}
 .c-game{font-family:var(--fm);font-size:.65rem;color:var(--r);letter-spacing:2px;text-transform:uppercase;margin-bottom:.2rem}
 .c-title{font-family:var(--fd);font-size:1rem;font-weight:600;color:var(--w);margin-bottom:.4rem;line-height:1.3}
-.c-desc{font-size:.78rem;color:var(--gl);line-height:1.5;margin-bottom:.7rem}
+.c-desc{font-size:.78rem;color:var(--gl);line-height:1.5;margin-bottom:.7rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .c-foot{display:flex;align-items:center;justify-content:space-between;padding-top:.7rem;border-top:1px solid var(--b4);gap:.5rem}
 .c-price{font-family:var(--fd);font-size:1.3rem;font-weight:700;color:var(--r)}
 .c-price small{font-size:.7rem;font-weight:400;color:var(--gl);font-family:var(--fb);margin-left:2px}
@@ -89,11 +90,16 @@ main{padding:1.5rem}
 .mbody{padding:1.3rem}
 
 .buy-info{background:var(--b3);border:1px solid var(--b4);padding:.9rem;margin-bottom:1rem;display:flex;gap:.9rem;align-items:center}
-.buy-emo{font-size:2.5rem}.buy-det h3{font-family:var(--fd);font-size:1rem;letter-spacing:1px}
+.buy-img{width:80px;height:80px;object-fit:cover;border:1px solid var(--b4)}
+.buy-det h3{font-family:var(--fd);font-size:1rem;letter-spacing:1px}
 .buy-price{font-family:var(--fd);font-size:1.5rem;font-weight:700;color:var(--r);margin-top:.2rem}
 .fbbtn{width:100%;background:#1877F2;border:none;color:#fff;font-family:var(--fd);font-size:.95rem;font-weight:700;letter-spacing:1px;padding:.75rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:.5rem;transition:all .2s}
 .fbbtn:hover{background:#1464d0;box-shadow:0 0 16px rgba(24,119,242,.4)}
 .note{margin-top:.9rem;padding:.7rem;background:rgba(200,0,20,.07);border-left:2px solid var(--r);font-size:.77rem;color:var(--gl);line-height:1.6}
+
+.img-slider{display:flex;gap:.5rem;overflow-x:auto;margin-bottom:1rem;padding-bottom:.5rem}
+.img-slider::-webkit-scrollbar{height:3px}
+.img-slider img{height:120px;aspect-ratio:16/9;object-fit:cover;border:1px solid var(--b4);cursor:pointer}
 
 .loading{grid-column:1/-1;text-align:center;padding:4rem;color:var(--gl)}
 .spinner{width:36px;height:36px;border:2px solid var(--b4);border-top-color:var(--r);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 1rem}
@@ -183,7 +189,6 @@ let shopInfo = { name:'GameShop', emoji:'🎮', desc:'ซื้อรหัส�
 let currentCat = 'all';
 let app, db;
 
-// Export functions to window
 window.setcat = (btn, cat) => {
   document.querySelectorAll('.catbtn').forEach(b => b.classList.remove('on'));
   btn.classList.add('on');
@@ -196,11 +201,16 @@ window.openShopFb = () => window.open(shopInfo.fb || 'https://www.facebook.com/'
 window.openBuy = (id) => {
   const p = allProducts.find(x => x.id === id);
   if (!p || p.stock <= 0) return;
+  
+  const imgHtml = p.images && p.images.length > 0 
+    ? `<div class="img-slider">${p.images.map(url => `<img src="${url}" onclick="window.open('${url}','_blank')">`).join('')}</div>`
+    : '';
+
   document.getElementById('buyBody').innerHTML = `
+    ${imgHtml}
     <div class="buy-info">
-      <div class="buy-emo">${p.emoji || '🎮'}</div>
       <div class="buy-det">
-        <div style="font-family:var(--fm);font-size:.62rem;color:var(--r);letter-spacing:2px">${p.game || ''}</div>
+        <div style="font-family:var(--fm);font-size:.62rem;color:var(--r);letter-spacing:2px">${p.game || ''} | ${p.customId || p.id}</div>
         <h3>${p.title}</h3>
         <div class="buy-price">฿${Number(p.price).toLocaleString()}</div>
       </div>
@@ -222,30 +232,16 @@ window.goFb = (id) => {
   
   let fb = shopInfo.fb || 'https://www.facebook.com/';
   let fbId = '';
-  
   try {
     const u = new URL(fb);
-    // ดึง username หรือ ID จาก URL
     const path = u.pathname.replace(/^\/|\/$/g, '');
-    if (path) {
-      // กรณีเป็นลิงก์โปรไฟล์ทั่วไป เช่น facebook.com/username
-      fbId = path.split('/')[0];
-    }
-  } catch (e) {
-    // ถ้าไม่ใช่ URL อาจจะเป็น username โดยตรง
-    fbId = fb.trim();
-  }
+    if (path) fbId = path.split('/')[0];
+  } catch (e) { fbId = fb.trim(); }
 
-  // สร้างข้อความรายละเอียดสินค้า
-  const msg = `สนใจสั่งซื้อสินค้าครับ\n\n🎮 เกม: ${p.game || '-'}\n📦 สินค้า: ${p.title}\n💰 ราคา: ฿${Number(p.price).toLocaleString()}\n🆔 รหัสสินค้า: ${p.id}`;
+  const msg = `สนใจสั่งซื้อสินค้าครับ\n\n🎮 เกม: ${p.game || '-'}\n📦 สินค้า: ${p.title}\n💰 ราคา: ฿${Number(p.price).toLocaleString()}\n🆔 รหัสสินค้า: ${p.customId || p.id}\n🔗 รูปภาพ: ${p.images ? p.images[0] : 'ไม่มีรูป'}`;
   const encodedMsg = encodeURIComponent(msg);
-
-  // ใช้ลิงก์ m.me พร้อมข้อความ (หมายเหตุ: m.me รองรับข้อความผ่านพารามิเตอร์ text ในบางแพลตฟอร์ม)
-  // แต่ที่แน่นอนที่สุดคือการเปิดแชท ส่วนข้อความลูกค้าสามารถกดวางได้ถ้าเบราว์เซอร์รองรับการ copy อัตโนมัติ
-  // ในที่นี้เราจะพยายามเปิดลิงก์ที่ตรงที่สุด
   const chatUrl = `https://m.me/${fbId}?text=${encodedMsg}`;
   
-  // คัดลอกข้อความลง Clipboard เพื่อให้ลูกค้ากดวางได้ง่ายๆ (ถ้าเบราว์เซอร์อนุญาต)
   if (navigator.clipboard) {
     navigator.clipboard.writeText(msg).catch(() => {});
   }
@@ -269,7 +265,7 @@ window.renderProducts = () => {
   const q = document.getElementById('searchQ').value.toLowerCase();
   const list = allProducts.filter(p => {
     const mc = currentCat === 'all' || p.cat === currentCat;
-    const mq = !q || p.title.toLowerCase().includes(q) || (p.game || '').toLowerCase().includes(q);
+    const mq = !q || p.title.toLowerCase().includes(q) || (p.game || '').toLowerCase().includes(q) || (p.customId || '').toLowerCase().includes(q);
     return mc && mq;
   });
   const grid = document.getElementById('grid');
@@ -284,11 +280,12 @@ window.renderProducts = () => {
     const stockTxt = so ? 'หมดสต็อก' : low ? `เหลือ ${p.stock} ชิ้น` : `สต็อก ${p.stock}`;
     const stockCls = so ? 'out' : low ? 'low' : '';
     const badgeHtml = so ? `<div class="badge sold">SOLD OUT</div>` : p.badge === 'hot' ? `<div class="badge hot">HOT</div>` : p.badge === 'new' ? `<div class="badge new">NEW</div>` : '';
+    const thumb = p.images && p.images.length > 0 ? `<img src="${p.images[0]}">` : `<div style="font-size:3rem">🎮</div>`;
     return `
     <div class="card${so ? ' soldout' : ''}" onclick="${so ? '' : "openBuy('" + p.id + "')" }">
-      <div class="card-thumb">${p.emoji || '🎮'}${badgeHtml}</div>
+      <div class="card-thumb">${thumb}${badgeHtml}</div>
       <div class="cbody">
-        <div class="c-game">${p.game || ''}</div>
+        <div class="c-game">${p.game || ''} | ${p.customId || ''}</div>
         <div class="c-title">${p.title}</div>
         <div class="c-desc">${p.desc || ''}</div>
         <div class="c-foot">
@@ -316,7 +313,7 @@ function applyMeta() {
 function renderTicker() {
   const items = allProducts.filter(p => p.stock > 0);
   if (!items.length) return;
-  const txt = items.map(p => `${p.emoji || '🎮'} ${p.game} — ${p.title} ฿${Number(p.price).toLocaleString()}`).join(' &nbsp;●&nbsp; ');
+  const txt = items.map(p => `${p.game} — ${p.title} ฿${Number(p.price).toLocaleString()}`).join(' &nbsp;●&nbsp; ');
   document.getElementById('tickerEl').innerHTML = `&nbsp;&nbsp;&nbsp;${txt} &nbsp;●&nbsp; ${txt}`;
 }
 
@@ -337,24 +334,11 @@ function listenProducts() {
   });
 }
 
-function loadDemo() {
-  allProducts = [
-    {id:'demo1',title:'เพชร Free Fire 1000 เพชร',game:'Free Fire',cat:'mobile',desc:'เพชร FF ราคาถูก เติมให้เลย ปลอดภัย 100%',price:99,stock:50,emoji:'💎',badge:'hot'},
-    {id:'demo2',title:'UC PUBG Mobile 660 UC',game:'PUBG Mobile',cat:'mobile',desc:'UC ราคาถูก เติมได้ทุกเซิร์ฟ',price:249,stock:20,emoji:'🔫',badge:''},
-    {id:'demo3',title:'VALORANT 1000 VP',game:'VALORANT',cat:'pc',desc:'VP สำหรับซื้อสกิน ราคาพิเศษ',price:199,stock:15,emoji:'🏆',badge:'new'},
-    {id:'demo4',title:'Genshin 6480 Primogems',game:'Genshin Impact',cat:'mobile',desc:'Primo สำหรับ pull ตัวละคร',price:1490,stock:5,emoji:'✨',badge:'hot'},
-    {id:'demo5',title:'CS2 Prime Status',game:'CS2',cat:'pc',desc:'Account CS2 Prime เล่นได้เลย',price:399,stock:3,emoji:'🎯',badge:''},
-    {id:'demo6',title:'สกิน ROV ตำนาน',game:'ROV',cat:'mobile',desc:'สกินระดับตำนาน ราคาพิเศษ',price:350,stock:0,emoji:'⚔️',badge:''},
-  ];
-  window.renderProducts();
-}
-
 // Init
 try {
   if (!FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === 'YOUR_API_KEY') {
     document.getElementById('configNotice').style.display = 'flex';
     document.getElementById('configNotice').innerHTML = '⚠️ &nbsp;ยังไม่ได้ตั้งค่า Firebase — แก้ไขไฟล์ firebase-config.js';
-    loadDemo();
   } else {
     app = initializeApp(FIREBASE_CONFIG);
     db = getDatabase(app);
@@ -365,7 +349,6 @@ try {
   console.error("Firebase Init Error:", e);
   document.getElementById('configNotice').style.display = 'flex';
   document.getElementById('configNotice').innerHTML = `⚠️ &nbsp;Firebase Error: ${e.message}`;
-  loadDemo();
 }
 
 applyMeta();
