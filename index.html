@@ -227,6 +227,53 @@ try {
   loadDemo();
 }
 
+// ทำให้ฟังก์ชันเข้าถึงได้จากภายนอก module
+window.setcat = function(btn,cat) {
+  document.querySelectorAll('.catbtn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); currentCat=cat; renderProducts();
+};
+window.openShopFb = function() { window.open(shopInfo.fb||'https://www.facebook.com/','_blank'); };
+window.openBuy = function(id) {
+  const p = allProducts.find(x=>x.id===id);
+  if (!p||p.stock<=0) return;
+  document.getElementById('buyBody').innerHTML = `
+    <div class="buy-info">
+      <div class="buy-emo">${p.emoji||'🎮'}</div>
+      <div class="buy-det">
+        <div style="font-family:var(--fm);font-size:.62rem;color:var(--r);letter-spacing:2px">${p.game||''}</div>
+        <h3>${p.title}</h3>
+        <div class="buy-price">฿${Number(p.price).toLocaleString()}</div>
+      </div>
+    </div>
+    <div style="font-family:var(--fm);font-size:.68rem;color:var(--gl);margin-bottom:.3rem">รายละเอียด</div>
+    <div style="font-size:.82rem;color:var(--gll);line-height:1.6;margin-bottom:1rem">${p.desc||'-'}</div>
+    <div style="font-family:var(--fm);font-size:.68rem;color:var(--gl);margin-bottom:.8rem">
+      สต็อก: <span style="color:${p.stock<=5?'var(--orange)':'var(--green)'}">${p.stock} ชิ้น</span>
+    </div>
+    <button class="fbbtn" onclick="goFb('${id}')">📘 ติดต่อสั่งซื้อผ่าน Facebook</button>
+    <div class="note">ระบบจะเปิด Facebook เพื่อติดต่อกับทางร้านโดยตรง<br>กรุณาตกลงรายละเอียดและการชำระเงินกับทางร้านก่อนทุกครั้ง</div>
+  `;
+  document.getElementById('ovBuy').classList.add('on');
+};
+window.goFb = function(id) {
+  const p = allProducts.find(x=>x.id===id);
+  let fb = shopInfo.fb||'https://www.facebook.com/';
+  try {
+    const u = new URL(fb);
+    const path = u.pathname.replace(/^\/|\/$/g,'');
+    if (path && !path.startsWith('messages') && !path.startsWith('profile')) fb=`https://m.me/${path}`;
+  } catch(e){}
+  window.open(fb,'_blank');
+  closeOv('ovBuy');
+  toast('กำลังเปิด Facebook Messenger...');
+};
+window.closeOv = function(id) { document.getElementById(id).classList.remove('on'); };
+window.toast = function(msg, err=false) {
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.toggle('err',err); t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+};
+
 function loadDemo() {
   allProducts = [
     {id:'demo1',title:'เพชร Free Fire 1000 เพชร',game:'Free Fire',cat:'mobile',desc:'เพชร FF ราคาถูก เติมให้เลย ปลอดภัย 100%',price:99,stock:50,emoji:'💎',badge:'hot'},
@@ -274,13 +321,15 @@ function renderTicker() {
 }
 
 window.renderProducts = function() {
-  const q = document.getElementById('searchQ').value.toLowerCase();
+  const searchInput = document.getElementById('searchQ');
+  const q = searchInput ? searchInput.value.toLowerCase() : '';
   const list = allProducts.filter(p => {
     const mc = currentCat==='all' || p.cat===currentCat;
     const mq = !q || p.title.toLowerCase().includes(q) || (p.game||'').toLowerCase().includes(q);
     return mc && mq;
   });
   const grid = document.getElementById('grid');
+  if (!grid) return;
   if (!list.length) {
     grid.innerHTML = `<div class="empty"><div class="big">🔍</div><p>ไม่พบสินค้า</p></div>`;
     return;
@@ -292,7 +341,7 @@ window.renderProducts = function() {
     const stockCls = so?'out':low?'low':'';
     const badgeHtml = so?`<div class="badge sold">SOLD OUT</div>`:p.badge==='hot'?`<div class="badge hot">HOT</div>`:p.badge==='new'?`<div class="badge new">NEW</div>`:'';
     return `
-    <div class="card${so?' soldout':''}" onclick="${so?'':``openBuy('${p.id}')``}">
+    <div class="card${so?' soldout':''}" onclick="${so?'':'openBuy(\''+p.id+'\')'}">
       <div class="card-thumb">${p.emoji||'🎮'}${badgeHtml}</div>
       <div class="cbody">
         <div class="c-game">${p.game||''}</div>
@@ -303,63 +352,14 @@ window.renderProducts = function() {
             <div class="c-price">฿${Number(p.price).toLocaleString()}<small>บาท</small></div>
             <div class="c-stock ${stockCls}">${stockTxt}</div>
           </div>
-          <button class="buybtn" ${so?'disabled':''} onclick="event.stopPropagation();${so?'':``openBuy('${p.id}')``}">${so?'หมด':'ซื้อเลย'}</button>
+          <button class="buybtn" ${so?'disabled':''} onclick="event.stopPropagation();${so?'':'openBuy(\''+p.id+'\')'}">${so?'หมด':'ซื้อเลย'}</button>
         </div>
       </div>
     </div>`;
   }).join('');
 };
 
-window.openBuy = function(id) {
-  const p = allProducts.find(x=>x.id===id);
-  if (!p||p.stock<=0) return;
-  document.getElementById('buyBody').innerHTML = `
-    <div class="buy-info">
-      <div class="buy-emo">${p.emoji||'🎮'}</div>
-      <div class="buy-det">
-        <div style="font-family:var(--fm);font-size:.62rem;color:var(--r);letter-spacing:2px">${p.game||''}</div>
-        <h3>${p.title}</h3>
-        <div class="buy-price">฿${Number(p.price).toLocaleString()}</div>
-      </div>
-    </div>
-    <div style="font-family:var(--fm);font-size:.68rem;color:var(--gl);margin-bottom:.3rem">รายละเอียด</div>
-    <div style="font-size:.82rem;color:var(--gll);line-height:1.6;margin-bottom:1rem">${p.desc||'-'}</div>
-    <div style="font-family:var(--fm);font-size:.68rem;color:var(--gl);margin-bottom:.8rem">
-      สต็อก: <span style="color:${p.stock<=5?'var(--orange)':'var(--green)'}">${p.stock} ชิ้น</span>
-    </div>
-    <button class="fbbtn" onclick="goFb('${id}')">📘 ติดต่อสั่งซื้อผ่าน Facebook</button>
-    <div class="note">ระบบจะเปิด Facebook เพื่อติดต่อกับทางร้านโดยตรง<br>กรุณาตกลงรายละเอียดและการชำระเงินกับทางร้านก่อนทุกครั้ง</div>
-  `;
-  document.getElementById('ovBuy').classList.add('on');
-};
-
-window.goFb = function(id) {
-  const p = allProducts.find(x=>x.id===id);
-  let fb = shopInfo.fb||'https://www.facebook.com/';
-  try {
-    const u = new URL(fb);
-    const path = u.pathname.replace(/^\/|\/$/g,'');
-    if (path && !path.startsWith('messages') && !path.startsWith('profile')) fb=`https://m.me/${path}`;
-  } catch(e){}
-  window.open(fb,'_blank');
-  closeOv('ovBuy');
-  toast('กำลังเปิด Facebook Messenger...');
-};
-
-window.openShopFb = function() { window.open(shopInfo.fb||'https://www.facebook.com/','_blank'); };
-
-window.setcat = function(btn,cat) {
-  document.querySelectorAll('.catbtn').forEach(b=>b.classList.remove('on'));
-  btn.classList.add('on'); currentCat=cat; renderProducts();
-};
-
-window.closeOv = function(id) { document.getElementById(id).classList.remove('on'); };
-
-window.toast = function(msg, err=false) {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.classList.toggle('err',err); t.classList.add('show');
-  setTimeout(()=>t.classList.remove('show'),2800);
-};
+// ฟังก์ชันเหล่านี้ถูกย้ายไปด้านบนแล้วเพื่อให้เรียกใช้ได้ทันที
 
 applyMeta();
 </script>
