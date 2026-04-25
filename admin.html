@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel — GameShop</title>
+<!-- ไม่ให้ search engine index หน้านี้เลย -->
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="googlebot" content="noindex, nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Sarabun:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --r:#e8001d;--rd:#9a0013;--rg:#ff2040;
+  --b:#070707;--b2:#0f0f0f;--b3:#181818;--b4:#222;
+  --g:#333;--gl:#777;--gll:#aaa;
+  --w:#f0eaea;--wd:#b8b0b0;
+  --green:#00e676;--orange:#ff9100;
+  --fd:'Rajdhani',sans-serif;--fb:'Sarabun',sans-serif;--fm:'Share Tech Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--b);color:var(--w);font-family:var(--fb);min-height:100vh}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.06) 3px,rgba(0,0,0,.06) 4px);pointer-events:none;z-index:9999}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--b)}::-webkit-scrollbar-thumb{background:var(--rd)}
+
+/* LOGIN SCREEN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(180,0,18,.14),transparent 70%)}
+.login-box{background:var(--b2);border:1px solid var(--rd);width:100%;max-width:380px;padding:2rem;box-shadow:0 0 50px rgba(180,0,20,.2)}
+.login-logo{font-family:var(--fd);font-size:2rem;font-weight:700;letter-spacing:4px;color:var(--r);text-shadow:0 0 18px rgba(232,0,29,.5);margin-bottom:.2rem}
+.login-sub{font-family:var(--fm);font-size:.68rem;color:var(--gl);letter-spacing:2px;margin-bottom:2rem}
+.fl{display:block;font-family:var(--fm);font-size:.68rem;color:var(--r);letter-spacing:2px;margin-bottom:.35rem}
+.fi{width:100%;background:var(--b3);border:1px solid var(--g);color:var(--w);font-family:var(--fb);font-size:.88rem;padding:.55rem .85rem;outline:none;transition:border-color .2s;margin-bottom:1rem}
+.fi:focus{border-color:var(--r);box-shadow:0 0 8px rgba(200,0,20,.18)}
+.fi::placeholder{color:var(--g)}
+.login-btn{width:100%;background:var(--r);border:none;color:#fff;font-family:var(--fd);font-size:1rem;font-weight:700;letter-spacing:2px;padding:.75rem;cursor:pointer;transition:all .2s}
+.login-btn:hover{background:var(--rg);box-shadow:0 0 20px rgba(255,0,60,.4)}
+.login-err{color:var(--orange);font-family:var(--fm);font-size:.75rem;margin-bottom:.8rem;display:none}
+.login-back{display:block;text-align:center;margin-top:1rem;font-family:var(--fm);font-size:.72rem;color:var(--gl);text-decoration:none;transition:color .2s}
+.login-back:hover{color:var(--w)}
+
+/* ADMIN LAYOUT */
+#adminApp{display:none}
+.admin-header{background:rgba(7,7,7,.97);border-bottom:2px solid var(--r);padding:0 1.5rem;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;backdrop-filter:blur(12px)}
+.ah-left{display:flex;align-items:center;gap:1rem}
+.ah-logo{font-family:var(--fd);font-size:1.3rem;font-weight:700;letter-spacing:3px;color:var(--r)}
+.ah-tag{font-family:var(--fm);font-size:.62rem;color:var(--r);border:1px solid var(--rd);padding:.15rem .5rem;letter-spacing:1px}
+.ah-right{display:flex;gap:.5rem}
+.abtn{background:none;border:1px solid var(--g);color:var(--wd);font-family:var(--fb);font-size:.78rem;padding:.3rem .8rem;cursor:pointer;transition:all .2s}
+.abtn:hover{border-color:var(--r);color:var(--r)}
+.abtn.pri{background:var(--r);border-color:var(--r);color:#fff}
+.abtn.pri:hover{background:var(--rg)}
+
+/* TABS */
+.tabs{display:flex;border-bottom:1px solid var(--b4);padding:0 1.5rem;background:var(--b2)}
+.tab{font-family:var(--fm);font-size:.75rem;letter-spacing:1px;padding:.85rem 1.2rem;cursor:pointer;color:var(--gl);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.tab:hover{color:var(--wd)}
+.tab.on{color:var(--r);border-bottom-color:var(--r)}
+
+/* PANELS */
+.panel{display:none;padding:1.5rem;max-width:900px;margin:0 auto}
+.panel.on{display:block}
+
+/* SECTION */
+.sec{background:var(--b2);border:1px solid var(--b4);margin-bottom:1.2rem}
+.sec-head{padding:.9rem 1.2rem;border-bottom:1px solid var(--b4);display:flex;align-items:center;justify-content:space-between}
+.sec-title2{font-family:var(--fd);font-size:1rem;letter-spacing:2px;color:var(--wd)}
+.sec-body{padding:1.2rem}
+
+/* FORM */
+.fg{margin-bottom:1rem}
+.fs,.fta{width:100%;background:var(--b3);border:1px solid var(--g);color:var(--w);font-family:var(--fb);font-size:.88rem;padding:.55rem .85rem;outline:none;transition:border-color .2s;resize:none}
+.fs:focus,.fta:focus{border-color:var(--r)}
+.fs option{background:var(--b3)}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:.8rem}
+.fbtn{background:var(--r);border:none;color:#fff;font-family:var(--fd);font-size:.9rem;font-weight:700;letter-spacing:1px;padding:.65rem 1.5rem;cursor:pointer;transition:all .2s}
+.fbtn:hover{background:var(--rg);box-shadow:0 0 16px rgba(255,0,60,.4)}
+.fbtn.secondary{background:var(--b3);border:1px solid var(--g);color:var(--wd)}
+.fbtn.secondary:hover{border-color:var(--r);color:var(--r);box-shadow:none}
+.fbtn.danger{background:#1a0004;border:1px solid #5a0010;color:#ff4060}
+.fbtn.danger:hover{background:#2a0008;box-shadow:0 0 12px rgba(255,0,40,.25)}
+
+/* PRODUCT TABLE */
+.prod-list{display:flex;flex-direction:column;gap:.5rem}
+.prod-row{display:flex;align-items:center;gap:.7rem;padding:.7rem .9rem;background:var(--b3);border:1px solid var(--b4);transition:border-color .2s}
+.prod-row:hover{border-color:var(--g)}
+.prod-emo{font-size:1.5rem;flex-shrink:0;width:2rem;text-align:center}
+.prod-info{flex:1;min-width:0}
+.prod-name{font-size:.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prod-meta{font-family:var(--fm);font-size:.65rem;color:var(--gl);margin-top:.15rem}
+.stock-badge{display:inline-block;font-family:var(--fm);font-size:.62rem;padding:.1rem .4rem;margin-left:.4rem}
+.stock-badge.ok{background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.3)}
+.stock-badge.low{background:rgba(255,145,0,.12);color:var(--orange);border:1px solid rgba(255,145,0,.3)}
+.stock-badge.out{background:var(--b4);color:var(--gl);border:1px solid var(--g)}
+.prod-actions{display:flex;gap:.4rem;flex-shrink:0}
+.ia{background:none;border:1px solid var(--g);color:var(--wd);font-size:.7rem;padding:.28rem .65rem;cursor:pointer;font-family:var(--fm);transition:all .2s}
+.ia:hover{border-color:var(--r);color:var(--r)}
+.ia.danger{border-color:#3a0008;color:#c04050}
+.ia.danger:hover{background:#1a0004;border-color:var(--r);color:var(--rg)}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.8rem;margin-bottom:1.5rem}
+.stat-card{background:var(--b3);border:1px solid var(--b4);padding:1rem;text-align:center}
+.stat-num{font-family:var(--fd);font-size:2rem;font-weight:700;color:var(--r)}
+.stat-label{font-family:var(--fm);font-size:.65rem;color:var(--gl);letter-spacing:1px;margin-top:.2rem}
+
+/* OVERLAY */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:800;display:flex;align-items:center;justify-content:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .22s}
+.ov.on{opacity:1;pointer-events:all}
+.modal{background:var(--b2);border:1px solid var(--rd);width:100%;max-width:460px;max-height:92vh;overflow-y:auto;transform:translateY(16px);transition:transform .22s;box-shadow:0 0 50px rgba(180,0,20,.25)}
+.ov.on .modal{transform:translateY(0)}
+.mhead{padding:1rem 1.3rem;border-bottom:1px solid var(--b4);display:flex;align-items:center;justify-content:space-between}
+.mtitle{font-family:var(--fd);font-size:1.1rem;letter-spacing:2px;color:var(--r)}
+.mclose{background:none;border:1px solid var(--g);color:var(--gl);width:26px;height:26px;cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.mclose:hover{border-color:var(--r);color:var(--r)}
+.mbody{padding:1.3rem}
+
+/* SPINNER */
+.spinner{width:28px;height:28px;border:2px solid var(--b4);border-top-color:var(--r);border-radius:50%;animation:spin .8s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--b2);border:1px solid var(--r);padding:.7rem 1.1rem;font-family:var(--fm);font-size:.78rem;color:var(--w);z-index:9000;transform:translateX(140%);transition:transform .28s;box-shadow:0 0 18px rgba(200,0,20,.3);max-width:280px}
+.toast.show{transform:translateX(0)}.toast.err{border-color:var(--orange)}
+
+/* NOT CONFIGURED */
+.not-cfg{background:var(--b2);border:2px dashed var(--rd);padding:2rem;text-align:center;margin-bottom:1.5rem}
+.not-cfg h2{font-family:var(--fd);font-size:1.4rem;color:var(--r);letter-spacing:2px;margin-bottom:.8rem}
+.not-cfg p{font-size:.85rem;color:var(--gl);line-height:1.7;margin-bottom:.5rem}
+.not-cfg code{font-family:var(--fm);font-size:.8rem;color:var(--orange);background:var(--b3);padding:.1rem .4rem}
+
+@media(max-width:560px){
+  .frow{grid-template-columns:1fr}
+  .panel{padding:1rem}
+  .tabs{padding:0 .8rem}
+  .tab{padding:.75rem .8rem;font-size:.7rem}
+}
+</style>
+</head>
+<body>
+
+<!-- BLANK PAGE — shown to anyone without the secret token -->
+<div id="blankPage" style="min-height:100vh;display:flex;align-items:center;justify-content:center">
+  <div style="font-family:var(--fm);font-size:.75rem;color:#111;user-select:none">404</div>
+</div>
+
+<!-- LOGIN — hidden until URL token verified -->
+<div id="loginScreen" style="display:none;min-height:100vh;align-items:center;justify-content:center;padding:1rem;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(180,0,18,.14),transparent 70%)">
+  <div class="login-box">
+    <div class="login-logo">ADMIN</div>
+    <div class="login-sub">GAMESHOP CONTROL PANEL</div>
+    <label class="fl">อีเมล</label>
+    <input class="fi" id="loginEmail" type="email" placeholder="admin@example.com" onkeydown="if(event.key==='Enter')doLogin()">
+    <label class="fl">รหัสผ่าน</label>
+    <input class="fi" id="loginPw" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="login-err" id="loginErr">อีเมลหรือรหัสผ่านไม่ถูกต้อง</div>
+    <button class="login-btn" id="loginBtnEl" onclick="doLogin()">เข้าสู่ระบบ</button>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <div class="admin-header">
+    <div class="ah-left">
+      <div class="ah-logo" id="ahLogo">ADMIN</div>
+      <div class="ah-tag">⚙ CONTROL PANEL</div>
+    </div>
+    <div class="ah-right">
+      <a href="index.html" class="abtn">← หน้าร้าน</a>
+      <button class="abtn" onclick="doLogout()">ออกจากระบบ</button>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab on" onclick="switchTab(this,'tabDashboard')">📊 ภาพรวม</div>
+    <div class="tab" onclick="switchTab(this,'tabProducts')">📦 สินค้า</div>
+    <div class="tab" onclick="switchTab(this,'tabSettings')">⚙ ตั้งค่าร้าน</div>
+    <div class="tab" onclick="switchTab(this,'tabSetup')">🔧 Setup Guide</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="panel on" id="tabDashboard">
+    <div class="stats-grid" id="statsGrid">
+      <div class="stat-card"><div class="stat-num" id="st1">-</div><div class="stat-label">สินค้าทั้งหมด</div></div>
+      <div class="stat-card"><div class="stat-num" id="st2">-</div><div class="stat-label">มีสต็อก</div></div>
+      <div class="stat-card"><div class="stat-num" id="st3">-</div><div class="stat-label">ใกล้หมด (≤5)</div></div>
+      <div class="stat-card"><div class="stat-num" id="st4">-</div><div class="stat-label">หมดสต็อก</div></div>
+    </div>
+    <div class="sec">
+      <div class="sec-head"><div class="sec-title2">สินค้าใกล้หมด</div></div>
+      <div class="sec-body" id="lowStockList"><div style="color:var(--gl);font-family:var(--fm);font-size:.8rem">กำลังโหลด...</div></div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="panel" id="tabProducts">
+    <div class="sec">
+      <div class="sec-head">
+        <div class="sec-title2">สินค้าทั้งหมด</div>
+        <button class="abtn pri" onclick="openAddModal()">+ เพิ่มสินค้า</button>
+      </div>
+      <div class="sec-body">
+        <div class="prod-list" id="prodList"><div style="color:var(--gl);font-family:var(--fm);font-size:.8rem">กำลังโหลด...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="panel" id="tabSettings">
+    <div class="sec">
+      <div class="sec-head"><div class="sec-title2">ข้อมูลร้าน</div></div>
+      <div class="sec-body">
+        <div class="fg"><label class="fl">ชื่อร้าน</label><input class="fi" id="sName" placeholder="ชื่อร้านของคุณ"></div>
+        <div class="fg"><label class="fl">อีโมจิ/ไอคอน</label><input class="fi" id="sEmoji" placeholder="🎮" maxlength="4"></div>
+        <div class="fg"><label class="fl">คำอธิบายร้าน</label><textarea class="fta" id="sDesc" rows="2" placeholder="อธิบายร้านของคุณ..."></textarea></div>
+        <div class="fg"><label class="fl">Facebook URL ร้าน</label><input class="fi" id="sFb" placeholder="https://facebook.com/yourpage"></div>
+        <button class="fbtn" onclick="saveSettings()">💾 บันทึกการตั้งค่า</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SETUP GUIDE -->
+  <div class="panel" id="tabSetup">
+    <div id="cfgWarning" style="display:none">
+      <div class="not-cfg">
+        <h2>⚠ ยังไม่ได้ตั้งค่า Firebase</h2>
+        <p>ทำตามขั้นตอนด้านล่างเพื่อเชื่อมต่อกับ Firebase ของคุณ</p>
+      </div>
+    </div>
+    <div class="sec">
+      <div class="sec-head"><div class="sec-title2">วิธีตั้งค่า Firebase (ทำครั้งเดียว)</div></div>
+      <div class="sec-body" style="font-size:.85rem;line-height:1.9;color:var(--gll)">
+        <p style="margin-bottom:1rem;color:var(--gl);font-family:var(--fm);font-size:.72rem;letter-spacing:1px">ทำตามขั้นตอนนี้เพื่อให้ข้อมูลซิงค์ข้ามอุปกรณ์</p>
+
+        <div style="margin-bottom:1.2rem">
+          <div style="font-family:var(--fm);font-size:.72rem;color:var(--r);letter-spacing:2px;margin-bottom:.5rem">STEP 1 — สร้าง Firebase Project</div>
+          <ol style="padding-left:1.2rem;color:var(--gll)">
+            <li>ไปที่ <strong style="color:var(--w)">console.firebase.google.com</strong></li>
+            <li>คลิก <strong style="color:var(--w)">"Add project"</strong> → ตั้งชื่อ → Create</li>
+          </ol>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <div style="font-family:var(--fm);font-size:.72rem;color:var(--r);letter-spacing:2px;margin-bottom:.5rem">STEP 2 — เพิ่ม Web App</div>
+          <ol style="padding-left:1.2rem;color:var(--gll)">
+            <li>ใน Project → คลิกไอคอน <strong style="color:var(--w)">&lt;/&gt;</strong> (Web)</li>
+            <li>ตั้งชื่อ App → Register → คัดลอก <code>firebaseConfig</code></li>
+          </ol>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <div style="font-family:var(--fm);font-size:.72rem;color:var(--r);letter-spacing:2px;margin-bottom:.5rem">STEP 3 — เปิด Realtime Database</div>
+          <ol style="padding-left:1.2rem;color:var(--gll)">
+            <li>ซ้ายมือ → <strong style="color:var(--w)">Build → Realtime Database</strong></li>
+            <li>คลิก <strong style="color:var(--w)">"Create Database"</strong> → เลือก Region → Start in test mode</li>
+          </ol>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <div style="font-family:var(--fm);font-size:.72rem;color:var(--r);letter-spacing:2px;margin-bottom:.5rem">STEP 4 — เปิด Authentication (Email)</div>
+          <ol style="padding-left:1.2rem;color:var(--gll)">
+            <li><strong style="color:var(--w)">Build → Authentication → Get started</strong></li>
+            <li>Sign-in method → <strong style="color:var(--w)">Email/Password → Enable</strong></li>
+            <li>Users tab → <strong style="color:var(--w)">Add user</strong> → ใส่ email+รหัสผ่านของคุณ</li>
+          </ol>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <div style="font-family:var(--fm);font-size:.72rem;color:var(--r);letter-spacing:2px;margin-bottom:.5rem">STEP 5 — แก้ไขไฟล์ firebase-config.js</div>
+          <p style="margin-bottom:.5rem">เปิดไฟล์ <code>firebase-config.js</code> แล้วแทนที่ค่าด้วย config ของคุณ:</p>
+          <pre style="background:var(--b3);border:1px solid var(--b4);padding:1rem;font-family:var(--fm);font-size:.72rem;color:var(--orange);overflow-x:auto;line-height:1.8">export const FIREBASE_CONFIG = {
+  apiKey: "AIzaSy...",
+  authDomain: "your-app.firebaseapp.com",
+  databaseURL: "https://your-app-default-rtdb.firebaseio.com",
+  projectId: "your-app",
+  storageBucket: "your-app.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123:web:abc123"
+};</pre>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <div style="font-family:var(--fm);font-size:.72rem;color:var(--r);letter-spacing:2px;margin-bottom:.5rem">STEP 6 — ตั้งค่า Database Rules</div>
+          <p style="margin-bottom:.5rem">Realtime Database → Rules → แทนที่ด้วย:</p>
+          <pre style="background:var(--b3);border:1px solid var(--b4);padding:1rem;font-family:var(--fm);font-size:.72rem;color:var(--orange);overflow-x:auto;line-height:1.8">{
+  "rules": {
+    "shop": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+    "products": {
+      ".read": true,
+      ".write": "auth != null"
+    }
+  }
+}</pre>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <div style="font-family:var(--fm);font-size:.72rem;color:var(--r);letter-spacing:2px;margin-bottom:.5rem">STEP 7 — ตั้งค่า Secret Key (สำคัญมาก)</div>
+          <p style="margin-bottom:.5rem">เปิดไฟล์ <code>admin.html</code> แล้วหาบรรทัดนี้แล้วเปลี่ยนเป็นคีย์ของคุณเอง:</p>
+          <pre style="background:var(--b3);border:1px solid var(--b4);padding:.8rem;font-family:var(--fm);font-size:.72rem;color:var(--orange);overflow-x:auto">const SECRET_KEY = 'my-secret-2025'; // เปลี่ยนตรงนี้!</pre>
+          <p style="margin-top:.5rem">จากนั้นเข้า Admin ด้วย URL: <code>yoursite.github.io/admin.html?key=คีย์ของคุณ</code><br>
+          ถ้าไม่มี <code>?key=</code> ถูกต้อง จะเห็นแค่หน้า 404 เปล่าๆ</p>
+        </div>
+
+        <div style="margin-bottom:1.2rem">
+          <div style="font-family:var(--fm);font-size:.72rem;color:var(--r);letter-spacing:2px;margin-bottom:.5rem">STEP 8 — Deploy บน GitHub Pages</div>
+          <ol style="padding-left:1.2rem;color:var(--gll)">
+            <li>สร้าง Repository ใหม่บน GitHub</li>
+            <li>อัปโหลดไฟล์: <code>index.html</code>, <code>admin.html</code>, <code>firebase-config.js</code>, <code>robots.txt</code></li>
+            <li>Settings → Pages → Branch: main → Save</li>
+            <li>ได้ลิงก์ <code>https://username.github.io/repo-name</code></li>
+          </ol>
+        </div>
+
+        <div style="background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);padding:.8rem;font-family:var(--fm);font-size:.75rem;color:var(--green)">
+          ✓ หลังจากตั้งค่าแล้ว ข้อมูลสินค้าและตั้งค่าร้านจะซิงค์ real-time ทุกอุปกรณ์โดยอัตโนมัติ
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD / EDIT MODAL -->
+<div class="ov" id="ovAdd" onclick="if(event.target===this)closeOv('ovAdd')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="mhead"><div class="mtitle" id="addTitle">+ เพิ่มสินค้า</div><button class="mclose" onclick="closeOv('ovAdd')">✕</button></div>
+    <div class="mbody">
+      <input type="hidden" id="editId">
+      <div class="fg"><label class="fl">ชื่อสินค้า *</label><input class="fi" id="fTitle" placeholder="เช่น เพชร Free Fire 1000 เพชร"></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">ชื่อเกม *</label><input class="fi" id="fGame" placeholder="เช่น Free Fire"></div>
+        <div class="fg"><label class="fl">หมวดหมู่</label>
+          <select class="fs" id="fCat">
+            <option value="mobile">📱 มือถือ</option>
+            <option value="pc">💻 PC</option>
+            <option value="console">🎮 Console</option>
+            <option value="item">🎁 Item/สกิน</option>
+            <option value="account">👤 Account</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label class="fl">รายละเอียด</label><textarea class="fta" id="fDesc" rows="2" placeholder="รายละเอียดสินค้า..."></textarea></div>
+      <div class="frow">
+        <div class="fg"><label class="fl">ราคา (บาท) *</label><input class="fi" id="fPrice" type="number" placeholder="0"></div>
+        <div class="fg"><label class="fl">จำนวนสต็อก *</label><input class="fi" id="fStock" type="number" placeholder="0" min="0"></div>
+      </div>
+      <div class="frow">
+        <div class="fg"><label class="fl">อีโมจิ</label><input class="fi" id="fEmoji" placeholder="🎮" maxlength="4"></div>
+        <div class="fg"><label class="fl">Badge</label>
+          <select class="fs" id="fBadge">
+            <option value="">ไม่มี</option>
+            <option value="hot">🔥 HOT</option>
+            <option value="new">✨ NEW</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:.6rem;flex-wrap:wrap">
+        <button class="fbtn" onclick="saveProduct()">💾 บันทึก</button>
+        <button class="fbtn secondary" onclick="closeOv('ovAdd')">ยกเลิก</button>
+        <button class="fbtn danger" id="delBtn" style="display:none;margin-left:auto" onclick="deleteProduct()">🗑 ลบสินค้า</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getDatabase, ref, set, push, remove, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { FIREBASE_CONFIG } from "./firebase-config.js";
+
+let app, auth, db;
+let allProducts = [];
+let shopInfo = {};
+let editingId = null;
+let isConfigured = false;
+
+// ══════════════════════════════════════════
+//  SECRET TOKEN GUARD
+//  เข้าได้เฉพาะ URL: /admin.html?key=YOUR_SECRET_KEY
+//  เปลี่ยน SECRET_KEY ด้านล่างให้เป็นของคุณเอง
+// ══════════════════════════════════════════
+const SECRET_KEY = 'Kengshop'; // <-- เปลี่ยนตรงนี้!
+
+const params = new URLSearchParams(window.location.search);
+const keyOk = params.get('key') === SECRET_KEY;
+
+if (!keyOk) {
+  // ไม่มี token ถูกต้อง → แสดงหน้า 404 ปลอม
+  document.getElementById('blankPage').style.display = 'flex';
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'none';
+  // หยุด script ทั้งหมด — ไม่ init Firebase เลย
+  throw new Error('Access denied');
+}
+
+// token ถูกต้อง → ซ่อนหน้า 404
+document.getElementById('blankPage').style.display = 'none';
+
+try {
+  if (FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== 'YOUR_API_KEY') {
+    app = initializeApp(FIREBASE_CONFIG);
+    auth = getAuth(app);
+    db = getDatabase(app);
+    isConfigured = true;
+    onAuthStateChanged(auth, user => {
+      if (user) { showAdmin(); }
+      else { showLogin(); }
+    });
+  } else {
+    showLogin();
+    document.getElementById('cfgWarning').style.display = 'block';
+  }
+} catch(e) { if(e.message !== 'Access denied') showLogin(); }
+
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'flex';
+  document.getElementById('adminApp').style.display = 'none';
+}
+function showAdmin() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('adminApp').style.display = 'block';
+  listenData();
+}
+
+// ── AUTH ──
+window.doLogin = async function() {
+  if (!isConfigured) { toast('ยังไม่ได้ตั้งค่า Firebase — ดู Setup Guide','err'); return; }
+  const email = document.getElementById('loginEmail').value.trim();
+  const pw = document.getElementById('loginPw').value;
+  const btn = document.getElementById('loginBtnEl');
+  if (!email||!pw) { showErr(true,'กรุณากรอกอีเมลและรหัสผ่าน'); return; }
+  btn.textContent = 'กำลังเข้าสู่ระบบ...';
+  btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, pw);
+    showErr(false);
+  } catch(e) {
+    showErr(true,'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+    btn.textContent = 'เข้าสู่ระบบ'; btn.disabled = false;
+  }
+};
+
+window.doLogout = async function() {
+  if (auth) await signOut(auth);
+  showLogin();
+};
+
+function showErr(show, msg='') {
+  const el = document.getElementById('loginErr');
+  el.style.display = show ? 'block' : 'none';
+  if (msg) el.textContent = msg;
+  const btn = document.getElementById('loginBtnEl');
+  btn.textContent = 'เข้าสู่ระบบ'; btn.disabled = false;
+}
+
+// ── DATA ──
+function listenData() {
+  if (!db) return;
+  onValue(ref(db,'shop'), snap => {
+    shopInfo = snap.val() || {};
+    applyShopToForm();
+    document.getElementById('ahLogo').textContent = (shopInfo.name||'ADMIN').toUpperCase();
+  });
+  onValue(ref(db,'products'), snap => {
+    const d = snap.val();
+    allProducts = d ? Object.entries(d).map(([id,v])=>({id,...v})) : [];
+    allProducts.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    renderProdList();
+    renderDashboard();
+  });
+}
+
+function renderDashboard() {
+  const total = allProducts.length;
+  const inStock = allProducts.filter(p=>p.stock>0).length;
+  const low = allProducts.filter(p=>p.stock>0&&p.stock<=5).length;
+  const out = allProducts.filter(p=>p.stock<=0).length;
+  document.getElementById('st1').textContent = total;
+  document.getElementById('st2').textContent = inStock;
+  document.getElementById('st3').textContent = low;
+  document.getElementById('st4').textContent = out;
+
+  const lowList = allProducts.filter(p=>p.stock>=0&&p.stock<=5);
+  const el = document.getElementById('lowStockList');
+  if (!lowList.length) {
+    el.innerHTML = `<div style="color:var(--gl);font-family:var(--fm);font-size:.8rem;padding:.5rem 0">✓ ไม่มีสินค้าใกล้หมด</div>`;
+    return;
+  }
+  el.innerHTML = lowList.map(p=>`
+    <div style="display:flex;align-items:center;gap:.7rem;padding:.5rem 0;border-bottom:1px solid var(--b4)">
+      <span style="font-size:1.2rem">${p.emoji||'🎮'}</span>
+      <div style="flex:1">
+        <div style="font-size:.85rem;font-weight:600">${p.title}</div>
+        <div style="font-family:var(--fm);font-size:.65rem;color:var(--gl)">${p.game}</div>
+      </div>
+      <span style="font-family:var(--fm);font-size:.72rem;color:${p.stock<=0?'var(--gl)':'var(--orange)'}">${p.stock<=0?'SOLD OUT':p.stock+' ชิ้น'}</span>
+      <button class="ia" onclick="openEditModal('${p.id}')">แก้ไข</button>
+    </div>`).join('');
+}
+
+function renderProdList() {
+  const el = document.getElementById('prodList');
+  if (!allProducts.length) {
+    el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--gl);font-family:var(--fm);font-size:.8rem">ยังไม่มีสินค้า — กด "+ เพิ่มสินค้า"</div>`;
+    return;
+  }
+  el.innerHTML = allProducts.map(p=>{
+    const sc = p.stock<=0?'out':p.stock<=5?'low':'ok';
+    const st = p.stock<=0?'SOLD OUT':p.stock<=5?`เหลือ ${p.stock}`:`${p.stock} ชิ้น`;
+    return `
+    <div class="prod-row">
+      <div class="prod-emo">${p.emoji||'🎮'}</div>
+      <div class="prod-info">
+        <div class="prod-name">${p.title}
+          ${p.badge?`<span style="font-family:var(--fm);font-size:.6rem;padding:.1rem .35rem;background:${p.badge==='hot'?'var(--r)':'var(--orange)'};color:${p.badge==='hot'?'#fff':'#000'};margin-left:.4rem">${p.badge.toUpperCase()}</span>`:''}
+        </div>
+        <div class="prod-meta">${p.game} · ฿${Number(p.price).toLocaleString()}
+          <span class="stock-badge ${sc}">${st}</span>
+        </div>
+      </div>
+      <div class="prod-actions">
+        <button class="ia" onclick="openEditModal('${p.id}')">แก้ไข</button>
+        <button class="ia danger" onclick="quickDel('${p.id}')">ลบ</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── PRODUCT CRUD ──
+window.openAddModal = function() {
+  editingId = null;
+  document.getElementById('addTitle').textContent = '+ เพิ่มสินค้า';
+  document.getElementById('delBtn').style.display = 'none';
+  ['fTitle','fGame','fDesc','fPrice','fStock','fEmoji'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('fCat').value='mobile';
+  document.getElementById('fBadge').value='';
+  openOv('ovAdd');
+};
+
+window.openEditModal = function(id) {
+  const p = allProducts.find(x=>x.id===id);
+  if (!p) return;
+  editingId = id;
+  document.getElementById('addTitle').textContent = '✏ แก้ไขสินค้า';
+  document.getElementById('delBtn').style.display = 'inline-flex';
+  document.getElementById('fTitle').value = p.title;
+  document.getElementById('fGame').value = p.game||'';
+  document.getElementById('fCat').value = p.cat||'mobile';
+  document.getElementById('fDesc').value = p.desc||'';
+  document.getElementById('fPrice').value = p.price;
+  document.getElementById('fStock').value = p.stock;
+  document.getElementById('fEmoji').value = p.emoji||'';
+  document.getElementById('fBadge').value = p.badge||'';
+  openOv('ovAdd');
+};
+
+window.saveProduct = async function() {
+  if (!db) { toast('ยังไม่ได้เชื่อมต่อ Firebase','err'); return; }
+  const title = document.getElementById('fTitle').value.trim();
+  const game = document.getElementById('fGame').value.trim();
+  const price = parseFloat(document.getElementById('fPrice').value);
+  const stock = parseInt(document.getElementById('fStock').value);
+  if (!title||!game||isNaN(price)||isNaN(stock)) { toast('กรุณากรอกข้อมูลให้ครบ','err'); return; }
+  const data = {
+    title, game,
+    cat: document.getElementById('fCat').value,
+    desc: document.getElementById('fDesc').value.trim(),
+    price, stock,
+    emoji: document.getElementById('fEmoji').value.trim()||'🎮',
+    badge: document.getElementById('fBadge').value,
+  };
+  try {
+    if (editingId) {
+      await set(ref(db,`products/${editingId}`), {...data, id: editingId});
+      toast('แก้ไขสินค้าแล้ว ✓');
+    } else {
+      data.createdAt = Date.now();
+      const newRef = push(ref(db,'products'));
+      await set(newRef, data);
+      toast('เพิ่มสินค้าแล้ว ✓');
+    }
+    closeOv('ovAdd');
+  } catch(e) { toast('เกิดข้อผิดพลาด: '+e.message,'err'); }
+};
+
+window.deleteProduct = async function() {
+  if (!editingId||!db) return;
+  if (!confirm('ยืนยันลบสินค้านี้?')) return;
+  try {
+    await remove(ref(db,`products/${editingId}`));
+    closeOv('ovAdd'); toast('ลบสินค้าแล้ว');
+  } catch(e) { toast('ลบไม่สำเร็จ','err'); }
+};
+
+window.quickDel = async function(id) {
+  if (!db) return;
+  if (!confirm('ยืนยันลบ?')) return;
+  try { await remove(ref(db,`products/${id}`)); toast('ลบแล้ว'); }
+  catch(e) { toast('ลบไม่สำเร็จ','err'); }
+};
+
+// ── SETTINGS ──
+function applyShopToForm() {
+  document.getElementById('sName').value = shopInfo.name||'';
+  document.getElementById('sEmoji').value = shopInfo.emoji||'';
+  document.getElementById('sDesc').value = shopInfo.desc||'';
+  document.getElementById('sFb').value = shopInfo.fb||'';
+}
+
+window.saveSettings = async function() {
+  if (!db) { toast('ยังไม่ได้เชื่อมต่อ Firebase','err'); return; }
+  const data = {
+    name: document.getElementById('sName').value.trim()||'GameShop',
+    emoji: document.getElementById('sEmoji').value.trim()||'🎮',
+    desc: document.getElementById('sDesc').value.trim(),
+    fb: document.getElementById('sFb').value.trim(),
+  };
+  try { await set(ref(db,'shop'), data); toast('บันทึกการตั้งค่าแล้ว ✓'); }
+  catch(e) { toast('บันทึกไม่สำเร็จ','err'); }
+};
+
+// ── HELPERS ──
+window.switchTab = function(btn, tabId) {
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(tabId).classList.add('on');
+};
+
+window.openOv = function(id) { document.getElementById(id).classList.add('on'); };
+window.closeOv = function(id) { document.getElementById(id).classList.remove('on'); };
+
+window.toast = function(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type==='err'?' err':'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+};
+</script>
+</body>
+</html>
