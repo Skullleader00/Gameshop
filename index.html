@@ -214,11 +214,12 @@ try {
     loadDemo();
   } else {
     app = initializeApp(FIREBASE_CONFIG);
-    db = getDatabase(app, "https://gameshop-d1362-default-rtdb.asia-southeast1.firebasedatabase.app");
+    db = getDatabase(app);
     listenShop();
     listenProducts();
   }
 } catch(e) {
+  console.error("Firebase Init Error:", e);
   document.getElementById('configNotice').style.display = 'flex';
   loadDemo();
 }
