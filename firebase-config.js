@@ -5,7 +5,7 @@
 // ============================================================
 
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBLZ3U2_wnybg1EKV6hig_YD-j2q3UFsvQ",
   authDomain: "gameshop-d1362.firebaseapp.com",
   databaseURL: "https://gameshop-d1362-default-rtdb.asia-southeast1.firebasedatabase.app",
