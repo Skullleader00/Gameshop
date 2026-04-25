@@ -218,15 +218,41 @@ window.openBuy = (id) => {
 
 window.goFb = (id) => {
   const p = allProducts.find(x => x.id === id);
+  if (!p) return;
+  
   let fb = shopInfo.fb || 'https://www.facebook.com/';
+  let fbId = '';
+  
   try {
     const u = new URL(fb);
+    // ดึง username หรือ ID จาก URL
     const path = u.pathname.replace(/^\/|\/$/g, '');
-    if (path && !path.startsWith('messages') && !path.startsWith('profile')) fb = `https://m.me/${path}`;
-  } catch (e) {}
-  window.open(fb, '_blank');
+    if (path) {
+      // กรณีเป็นลิงก์โปรไฟล์ทั่วไป เช่น facebook.com/username
+      fbId = path.split('/')[0];
+    }
+  } catch (e) {
+    // ถ้าไม่ใช่ URL อาจจะเป็น username โดยตรง
+    fbId = fb.trim();
+  }
+
+  // สร้างข้อความรายละเอียดสินค้า
+  const msg = `สนใจสั่งซื้อสินค้าครับ\n\n🎮 เกม: ${p.game || '-'}\n📦 สินค้า: ${p.title}\n💰 ราคา: ฿${Number(p.price).toLocaleString()}\n🆔 รหัสสินค้า: ${p.id}`;
+  const encodedMsg = encodeURIComponent(msg);
+
+  // ใช้ลิงก์ m.me พร้อมข้อความ (หมายเหตุ: m.me รองรับข้อความผ่านพารามิเตอร์ text ในบางแพลตฟอร์ม)
+  // แต่ที่แน่นอนที่สุดคือการเปิดแชท ส่วนข้อความลูกค้าสามารถกดวางได้ถ้าเบราว์เซอร์รองรับการ copy อัตโนมัติ
+  // ในที่นี้เราจะพยายามเปิดลิงก์ที่ตรงที่สุด
+  const chatUrl = `https://m.me/${fbId}?text=${encodedMsg}`;
+  
+  // คัดลอกข้อความลง Clipboard เพื่อให้ลูกค้ากดวางได้ง่ายๆ (ถ้าเบราว์เซอร์อนุญาต)
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(msg).catch(() => {});
+  }
+
+  window.open(chatUrl, '_blank');
   closeOv('ovBuy');
-  toast('กำลังเปิด Facebook Messenger...');
+  toast('กำลังเปิด Messenger...');
 };
 
 window.closeOv = (id) => document.getElementById(id).classList.remove('on');
